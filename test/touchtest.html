@@ -1,0 +1,100 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<style>
+body {
+    font-family: sans-serif;
+    background-color: #000;
+    color: #fff;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    font-size: 28px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+}
+#toucharea {
+    border: 1px solid #fff;
+    width: 300px;
+    text-align: center;
+    padding: 50px 0;
+}
+#canvas {
+    border: 1px solid #fff;
+}
+</style>
+<body>
+<script>
+var last_time = 0;
+window.addEventListener('load', function(){
+    var toucharea = document.getElementById('toucharea');
+    var delay = document.getElementById('delay');
+    ['touchstart', 'mousedown'].forEach(function(ev){
+        toucharea.addEventListener(ev, function(e){
+            document.body.style.backgroundColor = "#ffffff"; 
+
+            var diff = e.timeStamp - last_time;
+            last_time = e.timeStamp;
+            delay.innerHTML = Math.round(diff)/1000 + 's';
+
+            var x, y;
+            if (e.hasOwnProperty('targetTouches')) {
+                x = e.targetTouches[0].clientX - toucharea.offsetLeft;
+                y = e.targetTouches[0].clientY - toucharea.offsetTop;
+            } else {
+                x = e.offsetX;
+                y = e.offsetY;
+            }
+            drawPixelRelative(x/toucharea.clientWidth, y/toucharea.clientHeight);
+        }, false);
+    });
+    ['touchend', 'mouseup'].forEach(function(ev){
+        toucharea.addEventListener(ev, function(e){
+            document.body.style.backgroundColor = "#000000";
+        }, false);
+    });
+    document.ontouchmove = function(event){
+        event.preventDefault();
+    };
+    document.getElementById('btn').addEventListener("click", function() {
+        var el = document.documentElement,
+            rfs = el.requestFullScreen || el.webkitRequestFullScreen|| el.mozRequestFullScreen;
+        rfs.call(el);
+    });
+    var canvas = document.getElementById("canvas");
+    canvas.style.width = toucharea.clientWidth;
+    canvas.style.height = toucharea.clientHeight;
+    var canvasWidth = canvas.width;
+    var canvasHeight = canvas.height;
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle="#FF0000";
+    function drawPixelRelative(x, y) {
+        ctx.fillRect(x * canvasWidth,y * canvasHeight,3,3);
+    }
+
+
+}, false);
+</script>
+
+<span id="delay"></span>
+
+
+<div id="toucharea">
+    <span>TOUCH HERE</span>
+</div>
+
+<canvas id="canvas">
+
+</canvas>
+
+
+
+<span id="btn">Fullscreen</span>
+</body>
+</html>
